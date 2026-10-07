@@ -26,4 +26,5 @@ fi
 
 echo "Updates available $(git rev-parse --short HEAD) → $(git rev-parse --short "$REMOTE_SHA")"
 git pull --ff-only "$REMOTE" "$BRANCH"
-echo "Pull complete. Restart Open WebUI/Hermes if you changed scripts they depend on."
+echo "Pull complete. Restart stack if needed: ./stop.sh && ./start.sh"
+echo "Open WebUI package: pipx upgrade open-webui"
