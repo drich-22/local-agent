@@ -1,0 +1,12 @@
+.DS_Store
+.env
+.env.*
+!.env.example
+*.log
+update.log
+__pycache__/
+node_modules/
+.venv/
+venv/
+open-webui/
+*.bak
