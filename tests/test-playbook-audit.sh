@@ -39,6 +39,12 @@ fi
 
 # Web search documented as untrusted
 grep -qi 'web search' "${ROOT}/docs/SECURITY.md" && pass "web search risk documented" || fail "document web search"
+assert_file "docs/HARDENING.md"
+assert_file "docs/INCIDENT-RESPONSE.md"
+assert_file "kill-switch.sh"
+grep -q 'kill-switch' "${ROOT}/docs/HARDENING.md" && pass "kill switch documented" || fail "kill switch doc"
+grep -qi 'T4' "${ROOT}/docs/SECURITY.md" && pass "T4 tier documented" || fail "T4 missing"
+grep -qi 'OWASP' "${ROOT}/docs/SECURITY.md" && pass "OWASP pair documented" || fail "OWASP doc"
 
 # .env.example must not contain assignment values that look like real tokens
 if grep -vE '^\s*#' "${ROOT}/.env.example" | grep -qE '(gho_|ghp_|sk-[a-zA-Z0-9]{10,})'; then

@@ -2,6 +2,9 @@
 .env
 .env.*
 !.env.example
+secrets.env
+local-agent.env
+**/secrets.env
 *.log
 update.log
 __pycache__/

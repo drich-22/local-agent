@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+# Install: cp scripts/pre-commit.sample .git/hooks/pre-commit && chmod +x .git/hooks/pre-commit
+set -euo pipefail
+ROOT="$(git rev-parse --show-toplevel)"
+bash "${ROOT}/tests/test-secrets.sh" || exit 1
+bash "${ROOT}/tests/test-hardening.sh" || exit 1
+echo "pre-commit: secrets + hardening OK"

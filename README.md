@@ -14,6 +14,7 @@ cd local-agent
 chmod +x *.sh tests/*.sh
 ./setup-m5-ollama.sh
 ./setup-open-webui-native.sh
+./harden.sh
 ./start.sh
 ```
 
@@ -31,13 +32,17 @@ Models (defaults): `local-chat` (alias), `qwen3.6:27b`, `qwen2.5-coder:7b`, opti
 
 Foreground WebUI: `FG=1 ./start.sh`
 
-## Tests & playbook audit
+## Hardening
 
 ```bash
-./tests/run-all.sh
+./harden.sh              # secrets, env, Ollama bind, full test suite
+./kill-switch.sh         # emergency stop WebUI
+./tests/run-all.sh       # CI-style audits anytime
 ```
 
-Includes shell syntax, secret scan, repo layout, **agent-security-playbook** alignment (`playbook/README.md`, `docs/SECURITY.md`), and live checks for Ollama/Open WebUI when running.
+Docs: `docs/HARDENING.md`, `docs/SECURITY.md`, `docs/INCIDENT-RESPONSE.md`, `playbook/CHECKLIST.md` (maps to **agent-security-playbook**).
+
+Optional git hook: `cp scripts/pre-commit.sample .git/hooks/pre-commit && chmod +x .git/hooks/pre-commit`
 
 ## Configuration
 

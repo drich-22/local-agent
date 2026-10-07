@@ -4,7 +4,7 @@ source "$(dirname "$0")/lib.sh"
 
 echo "==> Repository layout"
 
-for f in README.md .gitignore .env.example setup-m5-ollama.sh setup-open-webui-native.sh start.sh stop.sh update.sh playbook/README.md docs/SECURITY.md; do
+for f in README.md .gitignore .env.example setup-m5-ollama.sh setup-open-webui-native.sh start.sh stop.sh update.sh kill-switch.sh harden.sh lib/security.sh playbook/README.md docs/SECURITY.md docs/HARDENING.md; do
   assert_file "$f"
 done
 

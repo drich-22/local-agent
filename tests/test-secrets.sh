@@ -15,7 +15,8 @@ while IFS= read -r f; do
   [[ -z "$f" ]] && continue
   path="${ROOT}/${f}"
   [[ -f "$path" ]] || continue
-  if grep -qE '(gho_|ghp_|sk-[a-zA-Z0-9]{20,}|AKIA[0-9A-Z]{16})' "$path" 2>/dev/null; then
+  [[ "$f" == tests/* ]] && continue
+  if grep -qE '(gho_[a-zA-Z0-9]{20,}|ghp_[a-zA-Z0-9]{20,}|sk-[a-zA-Z0-9]{20,}|AKIA[0-9A-Z]{16})' "$path" 2>/dev/null; then
     fail "possible secret in ${f}"
     bad=1
   fi

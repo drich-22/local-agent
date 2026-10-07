@@ -1,14 +1,34 @@
 #!/usr/bin/env bash
 # Open WebUI via pipx — native on macOS (no Docker). Talks to host Ollama on :11434.
 #
-# Usage: ./setup-open-webui-native.sh
+# Usage:
+#   ./setup-open-webui-native.sh
+#   ./setup-open-webui-native.sh --harden-only
 
 set -euo pipefail
 
-WEBUI_PORT="${WEBUI_PORT:-8080}"
-PYTHON_VERSION="${OPEN_WEBUI_PYTHON:-3.11}"
+ROOT="$(cd "$(dirname "$0")" && pwd)"
+# shellcheck source=lib/security.sh
+source "${ROOT}/lib/security.sh"
+load_repo_env "$ROOT"
 
-echo "==> Open WebUI (native pipx)"
+HARDEN_ONLY=0
+[[ "${1:-}" == "--harden-only" ]] && HARDEN_ONLY=1
+
+WEBUI_PORT="${WEBUI_PORT:-8080}"
+validate_port "$WEBUI_PORT" || exit 1
+PYTHON_VERSION="${OPEN_WEBUI_PYTHON:-3.11}"
+BIND_HOST="$(resolve_bind_host)"
+
+write_hardened_runtime_env "$WEBUI_PORT"
+export_runtime_env
+
+if [[ "$HARDEN_ONLY" == "1" ]]; then
+  echo "Hardened env written to ${LA_RUNTIME_ENV}"
+  exit 0
+fi
+
+echo "==> Open WebUI (native pipx, bind=${BIND_HOST})"
 echo ""
 
 if ! command -v brew &>/dev/null; then
@@ -43,19 +63,16 @@ cat > "$PLIST" <<PLIST
   <string>com.localagent.open-webui</string>
   <key>ProgramArguments</key>
   <array>
-    <string>$(command -v pipx)</string>
-    <string>run</string>
-    <string>open-webui</string>
-    <string>serve</string>
-    <string>--host</string>
-    <string>0.0.0.0</string>
-    <string>--port</string>
-    <string>${WEBUI_PORT}</string>
+    <string>${ROOT}/start.sh</string>
   </array>
   <key>EnvironmentVariables</key>
   <dict>
-    <key>OLLAMA_BASE_URL</key>
-    <string>http://127.0.0.1:11434</string>
+    <key>FG</key>
+    <string>1</string>
+    <key>BIND_HOST</key>
+    <string>${BIND_HOST}</string>
+    <key>WEBUI_PORT</key>
+    <string>${WEBUI_PORT}</string>
   </dict>
   <key>RunAtLoad</key>
   <false/>
@@ -71,12 +88,12 @@ PLIST
 
 echo ""
 echo "============================================"
-echo "  Open WebUI installed (native)"
+echo "  Open WebUI installed (native, hardened)"
 echo "============================================"
-echo "  Manual:  open-webui serve --port ${WEBUI_PORT}"
-echo "  Or:      ./start.sh"
-echo "  URL:     http://localhost:${WEBUI_PORT}"
-echo ""
-echo "  Enable in Settings: Web Search, Documents, Audio"
-echo "  Default Ollama: http://127.0.0.1:11434"
+echo "  Auth/signup : WEBUI_AUTH=true, ENABLE_SIGNUP=false"
+echo "  Secrets     : ${LA_SECRETS_FILE}"
+echo "  Runtime env : ${LA_RUNTIME_ENV}"
+echo "  Bind        : ${BIND_HOST}:${WEBUI_PORT}"
+echo "  Start       : ./start.sh"
+echo "  URL         : http://127.0.0.1:${WEBUI_PORT}"
 echo "============================================"

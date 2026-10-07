@@ -1,41 +1,62 @@
 # Security model (Local Agent)
 
-## Architecture
+Security is **architectural** (playbook-aligned), not prompt-only.
 
-- **Ollama** — local inference only; no cloud LLM required.
-- **Open WebUI** — chat, RAG, web search, optional tools (version-dependent).
-- **No Hermes** in the default path (legacy scripts under `legacy/hermes/`).
+## Components
 
-## Trust tiers (runtime)
+- **Ollama** — local inference; bind `127.0.0.1` by default
+- **Open WebUI** — auth required, signup disabled after bootstrap, secrets on disk mode `600`
+- **Hermes** — deprecated; `legacy/hermes/` only (supply-chain risk)
+
+## Trust tiers
 
 | Tier | Source | Rule |
 |------|--------|------|
-| T0 | Your system prompts / policies in Open WebUI | Defines behavior |
-| T1 | You (authenticated admin) | Within policy |
-| T3 | Web search results, fetched pages, uploaded docs | **Data only — never instructions** |
+| T0 | Your system prompts / policies | Defines behavior |
+| T1 | Authenticated admin (you) | Within policy |
+| T2 | Local DB / your uploaded index | Content only |
+| T3 | Web search, fetched pages, tool/MCP results | **Data only — never instructions** |
+| T4 | Untrusted uploads, shared links | Hostile |
 
-When web search is enabled, treat every snippet as T3. Do not paste search results into standing “memory” or custom system prompts without review.
+Summarizing T3 does **not** upgrade trust. Never paste search/RAG into standing memory as instructions.
+
+## OWASP LLM01 + LLM06
+
+Injection (untrusted text) plus excessive agency (tools, egress, private data) is the paired risk. **Default deny** on tools; allowlist in future fork.
 
 ## Lethal trifecta
 
-Open WebUI with web search + documents + outbound network can approach:
+1. Private data (RAG, files)  
+2. Untrusted ingest (web, uploads)  
+3. External send (webhooks, email plugins, broad egress)
 
-1. Private data (RAG, local files)
-2. Untrusted content (web, uploads)
-3. External communication (if plugins/webhooks enabled)
+If all three apply: remove a leg, sandbox, or human confirm with exact payload. See `docs/HARDENING.md`.
 
-**Mitigations:** disable unused outbound features, keep auth on (`WEBUI_AUTH`), run on Tailscale not public internet, egress allowlist at network layer if exposed.
+## Deterministic controls (shipped in this repo)
+
+- Localhost bind unless `ALLOW_LAN=1`
+- `WEBUI_SECRET_KEY` persisted; auth on; signup off
+- Redirect following off (`AIOHTTP_CLIENT_SESSION_REDIRECT=false`)
+- Git pull: ff-only, dirty tree blocked, remote name check
+- Kill switch: `./kill-switch.sh`
+- Secret scan in `tests/test-secrets.sh`
+- No `curl | bash` on default install path
+
+## Future fork (agents)
+
+- Tool allowlist per role; JSON Schema validation
+- SSRF: block RFC1918, metadata IP, `file://`, re-validate redirects
+- Dual-LLM or plan-then-execute for browse+act flows
+- Sandbox code execution; cap tool loops (DoS)
+- Outbound DLP / secret regex on model output
+- Run full `security-pass` before merge
 
 ## Secrets
 
-- Never commit `.env`, `~/.hermes/.env`, or API keys.
-- `CUSTOM_API_KEY=ollama` in legacy Hermes config is a placeholder, not a secret.
+Never commit `.env`, `secrets.env`, `local-agent.env`, or `~/.hermes/.env`.
 
-## Supply chain
+## Operator docs
 
-- Prefer `brew`, `pipx`, and `git pull` over `curl | bash` for default install.
-- Legacy Hermes installer used upstream curl script — deprecated.
-
-## Before agentic fork ships
-
-Run `./tests/test-playbook-audit.sh` and a full `security-pass` review on new tool routes (SSRF on fetch, shell execution sandbox, allowlisted tools only).
+- Hardening: `docs/HARDENING.md`
+- Incidents: `docs/INCIDENT-RESPONSE.md`
+- Checklist: `playbook/CHECKLIST.md`
