@@ -8,6 +8,8 @@
 #   ./switch-hermes-model.sh raw          # qwen3.6:27b (no custom ctx Modelfile)
 
 set -euo pipefail
+# shellcheck source=_guard.sh
+source "$(dirname "$0")/_guard.sh"
 
 ENV_FILE="$HOME/.hermes/.env"
 MODE="${1:-}"

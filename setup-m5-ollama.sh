@@ -28,6 +28,9 @@ if [[ "${ALLOW_LAN:-0}" == "1" ]]; then
 fi
 
 install_ollama_plist() {
+  local webui_port="${WEBUI_PORT:-8080}"
+  local ollama_origins
+  ollama_origins="$(ollama_origins_for_port "$webui_port")"
   echo "==> Configuring Ollama LaunchAgent (context=${CONTEXT_LENGTH}, host=${OLLAMA_HOST_BIND})..."
   mkdir -p "$HOME/Library/LaunchAgents" "$HOME/.ollama"
   cat > "$HOME/Library/LaunchAgents/com.localagent.ollama.plist" <<PLIST
@@ -50,6 +53,8 @@ install_ollama_plist() {
     <string>${CONTEXT_LENGTH}</string>
     <key>OLLAMA_KV_CACHE_TYPE</key>
     <string>q8_0</string>
+    <key>OLLAMA_ORIGINS</key>
+    <string>${ollama_origins}</string>
   </dict>
   <key>RunAtLoad</key>
   <true/>

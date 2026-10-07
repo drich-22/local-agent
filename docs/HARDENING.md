@@ -5,8 +5,23 @@ Apply after every setup, upgrade, or exposure change (LAN/Tailscale/public).
 ## One command
 
 ```bash
-./harden.sh
+./install.sh    # first-time: Ollama + WebUI + harden
+./harden.sh     # after upgrades or policy changes
+./verify-live.sh # on M5: ports, plist, auth flags
 ```
+
+## Gaps we close in software
+
+| Hole | Fix |
+|------|-----|
+| Auth/signup turned off in `.env` | `assert_secure_runtime` in `start.sh` (`ALLOW_INSECURE=1` to override) |
+| Open WebUI env not applied | `local-agent.env` sourced before every start |
+| Ollama wide open to any origin | `OLLAMA_ORIGINS` tied to WebUI port in LaunchAgent |
+| Docker exposes LAN by default | Publish `127.0.0.1:PORT` unless `ALLOW_LAN=1` |
+| Hermes curl installer | `LEGACY_HERMES=1` required under `legacy/hermes/` |
+| First admin blocked | `./bootstrap-signup.sh` once, then `./harden.sh` |
+| Session fixation on restart | Persistent `WEBUI_SECRET_KEY`; rotate with `./rotate-webui-secret.sh` |
+| Open WebUI ignores new env | Admin may have persisted settings — re-check Admin → Settings after `./harden.sh` |
 
 Writes `~/.local/share/open-webui/secrets.env` (600) and `local-agent.env` (600), re-applies Ollama localhost bind, runs `./tests/run-all.sh`.
 

@@ -3,6 +3,8 @@
 # Run on the M5 after setup-m5-hermes.sh
 
 set -euo pipefail
+# shellcheck source=_guard.sh
+source "$(dirname "$0")/_guard.sh"
 
 export PATH="$HOME/.local/bin:$PATH"
 export OLLAMA_CONTEXT_LENGTH="${OLLAMA_CONTEXT_LENGTH:-32768}"

@@ -5,6 +5,8 @@
 # Usage: ./configure-hermes-local.sh
 
 set -euo pipefail
+# shellcheck source=_guard.sh
+source "$(dirname "$0")/_guard.sh"
 
 PRIMARY_MODEL="qwen3.6:27b"
 FAST_MODEL="qwen2.5-coder:7b"

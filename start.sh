@@ -11,12 +11,19 @@ WEBUI_PORT="${WEBUI_PORT:-8080}"
 FG="${FG:-0}"
 validate_port "$WEBUI_PORT" || exit 1
 BIND_HOST="$(resolve_bind_host)"
-export_runtime_env
 
 if [[ ! -f "${LA_RUNTIME_ENV}" ]]; then
   echo "Missing ${LA_RUNTIME_ENV}. Run: ./setup-open-webui-native.sh"
   exit 1
 fi
+
+export_runtime_env
+if [[ "${ALLOW_SIGNUP:-0}" == "1" ]]; then
+  export ENABLE_SIGNUP=true
+fi
+read_secret_key
+check_path_permissions
+assert_secure_runtime
 
 if ! curl -sf "http://127.0.0.1:11434/api/tags" &>/dev/null; then
   echo "Starting Ollama LaunchAgent..."

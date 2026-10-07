@@ -10,7 +10,7 @@ echo "############################################"
 echo ""
 
 FAILED=0
-for t in test-shell-syntax.sh test-repo-layout.sh test-secrets.sh test-hardening.sh test-playbook-audit.sh test-update-dry-run.sh test-ollama-integration.sh test-open-webui-smoke.sh; do
+for t in test-shell-syntax.sh test-repo-layout.sh test-secrets.sh test-hardening.sh test-legacy-guard.sh test-playbook-audit.sh test-update-dry-run.sh test-ollama-integration.sh test-open-webui-smoke.sh; do
   echo ""
   if bash "${ROOT}/tests/${t}"; then
     echo ">>> ${t}: OK"

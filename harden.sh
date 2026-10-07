@@ -35,5 +35,10 @@ echo ""
 echo "==> Running test suite..."
 bash "${ROOT}/tests/run-all.sh"
 
+if curl -sf --max-time 2 "http://127.0.0.1:11434/api/tags" &>/dev/null; then
+  echo ""
+  bash "${ROOT}/verify-live.sh" || echo "  (fix live warnings above)"
+fi
+
 echo ""
 echo "==> Hardening complete. Restart: ./stop.sh && ./start.sh"

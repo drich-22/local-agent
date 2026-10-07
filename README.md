@@ -11,11 +11,10 @@ Clone from GitHub, run setup scripts, pull updates with `./update.sh`.
 ```bash
 git clone https://github.com/drich-22/local-agent.git
 cd local-agent
-chmod +x *.sh tests/*.sh
-./setup-m5-ollama.sh
-./setup-open-webui-native.sh
-./harden.sh
+chmod +x *.sh tests/*.sh lib/security.sh
+./install.sh          # or run setup scripts individually
 ./start.sh
+./verify-live.sh      # on the M5 after start
 ```
 
 Open **http://localhost:8080** → create admin → Settings → enable **Web Search**, **Documents**, **Audio** as needed.
