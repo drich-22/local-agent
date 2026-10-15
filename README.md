@@ -53,11 +53,22 @@ Copy `.env.example` → `.env` (local only, never commit).
 | `OLLAMA_CONTEXT_LENGTH` | 16384 |
 | `PRIMARY_MODEL` | qwen3.6:27b |
 
+## Hermes always-on (optional)
+
+Chat UI stays Open WebUI; **background agent** = Hermes **gateway** + cron (not the TUI).
+
+See **`hermes-daemon/README.md`** — LaunchAgent install, `/loop` vs cron, speed tuning.
+
+```bash
+LEGACY_HERMES=1 ./legacy/hermes/configure-hermes-local.sh
+./hermes-daemon/install-launchagent.sh
+```
+
 ## Legacy
 
 | Path | Notes |
 |------|--------|
-| `legacy/hermes/` | Old Hermes agent scripts (deprecated) |
+| `legacy/hermes/` | Hermes install/TUI (`LEGACY_HERMES=1`) |
 | `setup-open-webui.sh` | Docker UI; use `USE_DOCKER=1` to force |
 
 ## Roadmap

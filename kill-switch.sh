@@ -3,6 +3,7 @@
 set -euo pipefail
 
 STOP_OLLAMA="${STOP_OLLAMA:-0}"
+STOP_HERMES="${STOP_HERMES:-0}"
 ROOT="$(cd "$(dirname "$0")" && pwd)"
 # shellcheck source=lib/security.sh
 source "${ROOT}/lib/security.sh"
@@ -10,6 +11,10 @@ source "${ROOT}/lib/security.sh"
 echo "==> Kill switch: stopping Local Agent services"
 
 "${ROOT}/stop.sh" 2>/dev/null || true
+
+if [[ "$STOP_HERMES" == "1" ]] && [[ -x "${ROOT}/hermes-daemon/stop-gateway.sh" ]]; then
+  "${ROOT}/hermes-daemon/stop-gateway.sh"
+fi
 
 pkill -f "open-webui serve" 2>/dev/null || true
 pkill -f "uvicorn open_webui" 2>/dev/null || true
